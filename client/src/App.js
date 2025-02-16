@@ -8,6 +8,7 @@ import CharacterSelection from './components/CharacterSelection';
 import ChatArea from './components/ChatArea';
 import ImageGeneration from './components/ImageGeneration';
 import ImageEditor from './components/ImageEditor'; // Import ImageEditor
+import MainMenu from './components/MainMenu';
 
 function App() {
     const [selectedCharacter, setSelectedCharacter] = useState('');
@@ -35,46 +36,57 @@ function App() {
         palette: {
             mode: 'dark',
             primary: {
-                main: amber[500],
+                main: '#4dd0e1',
             },
             secondary: {
-                main: deepOrange[900],
+                main: '#757575',
             },
             background: {
-                default: grey[900],
-                paper: grey[800],
+                default: '#121212',
+                paper: '#1e1e1e',
             },
             text: {
-                primary: '#fff',
-                secondary: '#bdbdbd',
+                primary: '#ffffff',
+                secondary: '#b0bec5',
             },
         },
         components: {
             MuiAppBar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: grey[900],
+                        backgroundColor: '#1e1e1e',
                     },
                 },
             },
             MuiPaper: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: grey[800],
+                        backgroundColor: '#1e1e1e',
                     },
                 },
             },
             MuiMenu: {
                 styleOverrides: {
                     paper: {
-                        backgroundColor: grey[800],
+                        backgroundColor: '#1e1e1e',
                     },
                 },
             },
             MuiMenuItem: {
                 styleOverrides: {
                     root: {
-                        color: '#fff',
+                        color: '#ffffff',
+                    },
+                },
+            },
+            MuiButton: {
+                styleOverrides: {
+                    root: {
+                        color: '#ffffff',
+                        backgroundColor: '#424242',
+                        '&:hover': {
+                            backgroundColor: '#616161',
+                        },
                     },
                 },
             },
@@ -85,53 +97,7 @@ function App() {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Box sx={{ flexGrow: 1 }}>
-                <AppBar position="static">
-                    <Toolbar>
-                        <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                            sx={{ mr: 2 }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            RPGPT - React & Material UI
-                        </Typography>
-                        <div>
-                            <IconButton
-                                size="large"
-                                aria-label="account of current user"
-                                aria-controls="menu-appbar"
-                                aria-haspopup="true"
-                                onClick={handleMenu}
-                                color="inherit"
-                            >
-                                <Avatar sx={{ bgcolor: deepOrange[500] }}>UN</Avatar>
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorEl)}
-                                onClose={handleClose}
-                            >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
-                                <MenuItem onClick={handleClose}>Logout</MenuItem>
-                            </Menu>
-                        </div>
-                    </Toolbar>
-                </AppBar>
+                <MainMenu /> 
 
                 <Box p={3}>
                     <CharacterSelection onCharacterSelect={handleCharacterSelect} />

@@ -39,9 +39,23 @@ const CharacterSelection = ({ onCharacterSelect }) => {
                 value={selectedCharacter}
                 onChange={handleChange}
                 label="Select Character"
+                MenuProps={{
+                    PaperProps: {
+                        sx: {
+                            bgcolor: 'background.paper',
+                            '& .MuiMenuItem-root': {
+                                '&:hover': {
+                                    bgcolor: 'action.hover',
+                                },
+                            },
+                        },
+                    },
+                }}
             >
                 {characters.map((character) => (
-                    <MenuItem key={character} value={character}>{character}</MenuItem>
+                    <MenuItem key={character} value={character} sx={{ bgcolor: selectedCharacter === character ? 'action.selected' : 'inherit' }}>
+                        {character}
+                    </MenuItem>
                 ))}
             </Select>
         </FormControl>

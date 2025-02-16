@@ -29,47 +29,145 @@ RPGPT is a web application that combines the creativity of role-playing games wi
     *   Axios (HTTP Client)
 
 ## Project Structure
-
-markdown
 RPGPT/
-│
-├── app.py                           # Flask API backend
-├── config.py
-│
-├── rpgpt/
-│   ├── __init__.py
-│   ├── chat_logic.py                # Handles Chat Logic
-│   ├── image_gen.py                 # Handles Image Generation
-│   ├── image_editor.py
-│   ├── image_effects.py
-│   ├── upscale_ai.py
-│
-├── data/
-│   ├── characters.json              # Character Definitions
-│   ├── example.png
-│   ├── example2.png
-│   ├── OCIO/
-│   │   └── color.ocio
-│   ├── LUTs/
-│   │   ├── my_lut.cube
-│   │   └── other_lut.png
-│
-├── client/                          # React Frontend
-│   ├── package.json
-│   ├── public/
-│   │   └── index.html
-│   ├── src/
-│   │   ├── App.js                   # Main React component
-│   │   ├── components/
-│   │   │   ├── CharacterSelection.js  # Character Selection Component
-│   │   │   ├── ChatArea.js            # Chat Area Component
-│   │   │   ├── ImageGeneration.js     # Image Generation Component
-│   │   │   └── ...
-│   │   └── services/
-│   │       └── api.js               # API Service
-│   └── ...
-│
-└── requirements.txt                 # Python Dependencies
+<table>
+  <tr>
+    <th>Path</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>app.py</td>
+    <td>Flask API backend</td>
+  </tr>
+  <tr>
+    <td>config.py</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>rpgpt/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>rpgpt/__init__.py</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>rpgpt/chat_logic.py</td>
+    <td>Handles Chat Logic</td>
+  </tr>
+  <tr>
+    <td>rpgpt/image_gen.py</td>
+    <td>Handles Image Generation</td>
+  </tr>
+  <tr>
+    <td>rpgpt/image_editor.py</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>rpgpt/image_effects.py</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>rpgpt/upscale_ai.py</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/characters.json</td>
+    <td>Character Definitions</td>
+  </tr>
+  <tr>
+    <td>data/example.png</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/example2.png</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/OCIO/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/OCIO/color.ocio</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/LUTs/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/LUTs/my_lut.cube</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>data/LUTs/other_lut.png</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/</td>
+    <td>React Frontend</td>
+  </tr>
+  <tr>
+    <td>client/package.json</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/public/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/public/index.html</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/src/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/src/App.js</td>
+    <td>Main React component</td>
+  </tr>
+  <tr>
+    <td>client/src/components/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/src/components/CharacterSelection.js</td>
+    <td>Character Selection Component</td>
+  </tr>
+  <tr>
+    <td>client/src/components/ChatArea.js</td>
+    <td>Chat Area Component</td>
+  </tr>
+  <tr>
+    <td>client/src/components/ImageGeneration.js</td>
+    <td>Image Generation Component</td>
+  </tr>
+  <tr>
+    <td>client/src/components/...</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/src/services/</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>client/src/services/api.js</td>
+    <td>API Service</td>
+  </tr>
+  <tr>
+    <td>client/...</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>requirements.txt</td>
+    <td>Python Dependencies</td>
+  </tr>
+</table>
 
 ## Setup Instructions
 

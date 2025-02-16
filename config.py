@@ -2,7 +2,8 @@
 import os
 
 # Text Model Configuration
-TEXT_MODEL_NAME = "microsoft/Phi-3.5-mini-instruct" # Default text generation model
+TEXT_MODEL_NAME = "Qwen/Qwen2.5-Coder-32B-Instruct" # Default text generation model
+# microsoft/Phi-3.5-mini-instruct
 
 # Image Model Configuration
 IMAGE_MODEL_NAME = "stabilityai/stable-diffusion-2-1" #Default Stable Diffusion v1.5

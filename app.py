@@ -1,6 +1,8 @@
+import os
+os.environ['HF_HOME'] = './.cache'
+
 # app.py
 from flask import Flask, request, jsonify, send_from_directory, Response
-import os
 import json
 import subprocess
 from flask_cors import CORS
@@ -18,13 +20,32 @@ with open(CHARACTER_DATA_FILE, 'r') as f:
     character_data = json.load(f)
 
 # Initialize Image Generator
-image_generator = ImageGenerator()
+print("Preloading ImageGenerator model...")
+try:
+    global_image_generator = ImageGenerator()
+    print("ImageGenerator model preloaded successfully.")
+except Exception as e:
+    global_image_generator = None
+    print(f"Failed to preload ImageGenerator model: {e}. The application may not work correctly.")
+
+# Preload ChatLogic model
+print("Preloading ChatLogic model...")
+try:
+    global_chat_logic_model = ChatLogic.load_model()
+    if global_chat_logic_model is None:
+        raise Exception("Failed to preload ChatLogic model: load_model return None")
+    print("ChatLogic model preloaded successfully.")
+except Exception as e:
+    global_chat_logic_model = None
+    print(f"Failed to preload ChatLogic model: {e}. The application may not work correctly.")
 
 selected_character = None
 chat_logic = None
 
 # SSE Route
 def generate_image_process(prompt, negative_prompt, width, height, cfg_scale):
+    global global_image_generator
+
     def event_stream():
         try:
             # Simulate image generation with progress updates
@@ -32,14 +53,18 @@ def generate_image_process(prompt, negative_prompt, width, height, cfg_scale):
                 time.sleep(0.1)  # Simulate work
                 yield f"{json.dumps({'progress': i})}\n\n"
 
-            image = image_generator.generate_image_stable_diffusion_local(prompt, negative_prompt, width, height, cfg_scale)
-            if image:
-                image_path = "client/public/images/generated_image.png"
-                image.save(image_path)
-                image_url = "/images/generated_image.png"
-                yield f"{json.dumps({'image_url': image_url})}\n\n"
+            if global_image_generator:
+                image = global_image_generator.generate_image_stable_diffusion_local(prompt, negative_prompt, width, height, cfg_scale)
+                if image:
+                    image_path = "client/public/images/generated_image.png"
+                    image.save(image_path)
+                    image_url = "/images/generated_image.png"
+                    yield f"{json.dumps({'image_url': image_url})}\n\n"
+                else:
+                    yield f"{json.dumps({'error': 'Failed to generate image'})}\n\n"
             else:
-                yield f"{json.dumps({'error': 'Failed to generate image'})}\n\n"
+                yield f"{json.dumps({'error': 'Image generator not initialized'})}\n\n"
+
 
         except Exception as e:
             yield f"{json.dumps({'error': str(e)})}\n\n"
@@ -74,20 +99,23 @@ def get_characters():
 
 @app.route('/api/select_character', methods=['POST'])
 def select_character():
-    global selected_character, chat_logic
+    global selected_character, chat_logic, global_chat_logic_model
     character_name = request.json['character_name']
     selected_character = next((char for char in character_data if char['name'] == character_name), None)
 
     if selected_character:
-        if chat_logic:
-            chat_logic.unload_model()
-            chat_logic = None
-
         chat_logic = ChatLogic(
             selected_character["name"],
             selected_character["description"],
             selected_character["tags"] if "tags" in selected_character else []
         )
+
+        if global_chat_logic_model:
+            chat_logic.generator = global_chat_logic_model #Assign the model when a character is selected
+        else:
+            return jsonify({"status": "error", "message": "Global Chat logic model is not initialized."})
+
+
         return jsonify({"status": "success", "message": f"Character {character_name} selected"})
     else:
         return jsonify({"status": "error", "message": "Character not found"})
@@ -111,7 +139,7 @@ def get_response():
 
 @app.route('/api/generate_image', methods=['POST'])
 def generate_image():
-    global image_generator
+    global image_generator, global_image_generator
     data = request.get_json()
     prompt = data['prompt']
     negative_prompt = data.get('negative_prompt', DEFAULT_NEGATIVE_PROMPT)
@@ -123,8 +151,10 @@ def generate_image():
         return jsonify({"error": "No character selected."})
 
     try:
-        #image_generator = ImageGenerator()  # Initialize here
-        image = image_generator.generate_image_stable_diffusion_local(prompt, negative_prompt, width, height, cfg_scale=cfg_scale)
+        if global_image_generator is None:
+            return jsonify({"error": "Image Generator is not initialized properly."})
+
+        image = global_image_generator.generate_image_stable_diffusion_local(prompt, negative_prompt, width, height, cfg_scale)
 
         if image:
             image_path = "client/public/images/generated_image.png"
@@ -173,4 +203,4 @@ if __name__ == '__main__':
     build_react_app()
 
     print("Starting Flask app...")
-    app.run(debug=False)
+    app.run(debug=False) #set Debug True or False

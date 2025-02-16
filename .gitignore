@@ -39,3 +39,4 @@ client/public/images/generated_image.png
 
 # Other
 .env
+.cache
