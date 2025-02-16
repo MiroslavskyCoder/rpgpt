@@ -41,15 +41,15 @@ RPGPT/
   </tr>
   <tr>
     <td>config.py</td>
-    <td></td>
+    <td>Configuration file</td>
   </tr>
   <tr>
     <td>rpgpt/</td>
-    <td></td>
+    <td>Main source code</td>
   </tr>
   <tr>
     <td>rpgpt/__init__.py</td>
-    <td></td>
+    <td>Package initialization</td>
   </tr>
   <tr>
     <td>rpgpt/chat_logic.py</td>
@@ -61,19 +61,19 @@ RPGPT/
   </tr>
   <tr>
     <td>rpgpt/image_editor.py</td>
-    <td></td>
+    <td>Handles image editing</td>
   </tr>
   <tr>
     <td>rpgpt/image_effects.py</td>
-    <td></td>
+    <td>Handles image effects</td>
   </tr>
   <tr>
     <td>rpgpt/upscale_ai.py</td>
-    <td></td>
+    <td>Handles AI-based image upscaling</td>
   </tr>
   <tr>
     <td>data/</td>
-    <td></td>
+    <td>Data files</td>
   </tr>
   <tr>
     <td>data/characters.json</td>
@@ -81,31 +81,31 @@ RPGPT/
   </tr>
   <tr>
     <td>data/example.png</td>
-    <td></td>
+    <td>Example image</td>
   </tr>
   <tr>
     <td>data/example2.png</td>
-    <td></td>
+    <td>Example image</td>
   </tr>
   <tr>
     <td>data/OCIO/</td>
-    <td></td>
+    <td>OCIO files</td>
   </tr>
   <tr>
     <td>data/OCIO/color.ocio</td>
-    <td></td>
+    <td>OCIO color profile</td>
   </tr>
   <tr>
     <td>data/LUTs/</td>
-    <td></td>
+    <td>LUT files</td>
   </tr>
   <tr>
     <td>data/LUTs/my_lut.cube</td>
-    <td></td>
+    <td>LUT for image editing</td>
   </tr>
   <tr>
     <td>data/LUTs/other_lut.png</td>
-    <td></td>
+    <td>LUT for image editing</td>
   </tr>
   <tr>
     <td>client/</td>
@@ -113,19 +113,19 @@ RPGPT/
   </tr>
   <tr>
     <td>client/package.json</td>
-    <td></td>
+    <td>Package configuration</td>
   </tr>
   <tr>
     <td>client/public/</td>
-    <td></td>
+    <td>Public files</td>
   </tr>
   <tr>
     <td>client/public/index.html</td>
-    <td></td>
+    <td>Index HTML</td>
   </tr>
   <tr>
     <td>client/src/</td>
-    <td></td>
+    <td>Source code</td>
   </tr>
   <tr>
     <td>client/src/App.js</td>
@@ -133,7 +133,7 @@ RPGPT/
   </tr>
   <tr>
     <td>client/src/components/</td>
-    <td></td>
+    <td>React components</td>
   </tr>
   <tr>
     <td>client/src/components/CharacterSelection.js</td>
@@ -149,11 +149,11 @@ RPGPT/
   </tr>
   <tr>
     <td>client/src/components/...</td>
-    <td></td>
+    <td>More React components</td>
   </tr>
   <tr>
     <td>client/src/services/</td>
-    <td></td>
+    <td>Services</td>
   </tr>
   <tr>
     <td>client/src/services/api.js</td>
@@ -161,7 +161,7 @@ RPGPT/
   </tr>
   <tr>
     <td>client/...</td>
-    <td></td>
+    <td>More frontend files</td>
   </tr>
   <tr>
     <td>requirements.txt</td>
@@ -174,7 +174,7 @@ RPGPT/
 1.  **Clone the repository:**
 
     ```bash
-    git clone [repository URL]
+    git clone https://github.com/MiroslavskyCoder/rpgpt
     cd RPGPT
     ```
 
@@ -240,7 +240,4 @@ The project uses the following environment variables. You can define them in `.e
 ## Contributing
 
 Please feel free to contribute to RPGPT by submitting pull requests, reporting issues, or suggesting new features.
-
-## License
-
-[Insert License Information Here]
+ 
