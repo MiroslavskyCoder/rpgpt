@@ -23,6 +23,11 @@ OCIO_CONFIG_PATH = os.path.join(BASE_DIR, "data", "OCIO", "color.ocio") # OCIO c
 ENABLE_TEXT_TO_SPEECH = False # Enable or disable text to speech
 ENABLE_IMAGE_EDITOR = True # Enable or disable image editor
 
+# LORA Configuration
+LORA_MODELS = [] # List of LORA models to choose from
+VAE_IN_SIZE = 512 # Input size of VAE
+VAE_OUT_SIZE = 512 # Output size of VAE
+
 # Default Character Data (if file is missing or empty)
 DEFAULT_CHARACTERS = {
     "default": {
