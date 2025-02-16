@@ -7,10 +7,12 @@ import { amber, deepOrange, grey } from '@mui/material/colors';
 import CharacterSelection from './components/CharacterSelection';
 import ChatArea from './components/ChatArea';
 import ImageGeneration from './components/ImageGeneration';
+import ImageEditor from './components/ImageEditor'; // Import ImageEditor
 
 function App() {
     const [selectedCharacter, setSelectedCharacter] = useState('');
-    const [anchorEl, setAnchorEl] = React.useState(null); //For menu
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [imageUrl, setImageUrl] = useState(''); // State to hold generated image URL
 
     const handleCharacterSelect = (characterName) => {
         setSelectedCharacter(characterName);
@@ -24,6 +26,11 @@ function App() {
         setAnchorEl(null);
     };
 
+    // Callback to receive the generated image URL from ImageGeneration
+    const handleImageGenerated = (url) => {
+        setImageUrl(url);
+    };
+
     const theme = createTheme({
         palette: {
             mode: 'dark',
@@ -34,8 +41,8 @@ function App() {
                 main: deepOrange[900],
             },
             background: {
-                default: grey[900], // VS Code Dark Background
-                paper: grey[800],   // Slightly Lighter for Paper
+                default: grey[900],
+                paper: grey[800],
             },
             text: {
                 primary: '#fff',
@@ -46,28 +53,28 @@ function App() {
             MuiAppBar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: grey[900], // Darkest grey for AppBar
+                        backgroundColor: grey[900],
                     },
                 },
             },
             MuiPaper: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: grey[800], // Darker background for paper components
+                        backgroundColor: grey[800],
                     },
                 },
             },
             MuiMenu: {
                 styleOverrides: {
                     paper: {
-                        backgroundColor: grey[800],   // Dark background for Menu
+                        backgroundColor: grey[800],
                     },
                 },
             },
             MuiMenuItem: {
                 styleOverrides: {
                     root: {
-                        color: '#fff',                 // White text for Menu Items
+                        color: '#fff',
                     },
                 },
             },
@@ -102,7 +109,6 @@ function App() {
                                 color="inherit"
                             >
                                 <Avatar sx={{ bgcolor: deepOrange[500] }}>UN</Avatar>
-                                {/*<AccountCircle />*/}
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
@@ -130,7 +136,8 @@ function App() {
                 <Box p={3}>
                     <CharacterSelection onCharacterSelect={handleCharacterSelect} />
                     <ChatArea />
-                    <ImageGeneration />
+                    <ImageGeneration onImageGenerated={handleImageGenerated} /> {/* Pass the callback */}
+                    {imageUrl && <ImageEditor imageUrl={imageUrl} />} {/* Render ImageEditor if imageUrl is available */}
                 </Box>
             </Box>
         </ThemeProvider>

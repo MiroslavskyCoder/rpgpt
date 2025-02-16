@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response
 import os
 import json
 import subprocess
@@ -7,6 +7,8 @@ from flask_cors import CORS
 from rpgpt.chat_logic import ChatLogic
 from rpgpt.image_gen import ImageGenerator
 from config import CHARACTER_DATA_FILE, DEFAULT_NEGATIVE_PROMPT, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_CFG_SCALE
+import time  # Import time module for simulating progress
+import threading
 
 app = Flask(__name__, static_folder='client/build', static_url_path='/')
 CORS(app)
@@ -18,16 +20,48 @@ with open(CHARACTER_DATA_FILE, 'r') as f:
 # Initialize Image Generator
 image_generator = ImageGenerator()
 
-# Preload the Model
-print("Preloading ChatLogic model...")
-chat_logic_model = ChatLogic.load_model()
-if chat_logic_model is None:
-    print("Failed to preload ChatLogic model.  The application may not work correctly.")
-else:
-    print("ChatLogic model preloaded successfully.")
-
 selected_character = None
 chat_logic = None
+
+# SSE Route
+def generate_image_process(prompt, negative_prompt, width, height, cfg_scale):
+    def event_stream():
+        try:
+            # Simulate image generation with progress updates
+            for i in range(101):
+                time.sleep(0.1)  # Simulate work
+                yield f"{json.dumps({'progress': i})}\n\n"
+
+            image = image_generator.generate_image_stable_diffusion_local(prompt, negative_prompt, width, height, cfg_scale)
+            if image:
+                image_path = "client/public/images/generated_image.png"
+                image.save(image_path)
+                image_url = "/images/generated_image.png"
+                yield f"{json.dumps({'image_url': image_url})}\n\n"
+            else:
+                yield f"{json.dumps({'error': 'Failed to generate image'})}\n\n"
+
+        except Exception as e:
+            yield f"{json.dumps({'error': str(e)})}\n\n"
+
+    return Response(event_stream(), mimetype="text/event-stream")
+
+@app.route('/api/generate_image_sse', methods=['POST'])
+def generate_image_sse():
+    data = request.get_json()
+    prompt = data['prompt']
+    negative_prompt = data.get('negative_prompt', DEFAULT_NEGATIVE_PROMPT)
+    width = int(data.get('width', DEFAULT_IMAGE_WIDTH))
+    height = int(data.get('height', DEFAULT_IMAGE_HEIGHT))
+    cfg_scale = float(data.get('cfg_scale', DEFAULT_CFG_SCALE))
+
+    if not selected_character:
+        return jsonify({"error": "No character selected."})
+
+    thread = threading.Thread(target=generate_image_process, args=(prompt, negative_prompt, width, height, cfg_scale))
+
+    thread.start()
+    return generate_image_process(prompt, negative_prompt, width, height, cfg_scale) #returns Response object.
 
 @app.route('/')
 def serve():
@@ -45,12 +79,15 @@ def select_character():
     selected_character = next((char for char in character_data if char['name'] == character_name), None)
 
     if selected_character:
+        if chat_logic:
+            chat_logic.unload_model()
+            chat_logic = None
+
         chat_logic = ChatLogic(
             selected_character["name"],
             selected_character["description"],
             selected_character["tags"] if "tags" in selected_character else []
         )
-        chat_logic.generator = chat_logic_model #Use Preloaded model!
         return jsonify({"status": "success", "message": f"Character {character_name} selected"})
     else:
         return jsonify({"status": "error", "message": "Character not found"})
@@ -136,4 +173,4 @@ if __name__ == '__main__':
     build_react_app()
 
     print("Starting Flask app...")
-    app.run(debug=True)
+    app.run(debug=False)

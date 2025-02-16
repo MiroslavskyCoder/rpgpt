@@ -1,56 +1,46 @@
 # rpgpt/image_gen.py
 from diffusers import StableDiffusionPipeline
+from PIL import Image
 import torch
-from config import IMAGE_MODEL_NAME, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_CFG_SCALE, DEFAULT_SEED, DEFAULT_NEGATIVE_PROMPT
-import random
+from config import DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_NEGATIVE_PROMPT, IMAGE_MODEL_NAME
 
 class ImageGenerator:
     def __init__(self):
         self.pipe = None
-        self.device = "cuda" if torch.cuda.is_available() else "cpu" #Check for CUDA
 
-        self.initialize_pipeline() # Load the pipeline
-
-    def initialize_pipeline(self):
+    def generate_image_stable_diffusion_local(self, prompt, negative_prompt=DEFAULT_NEGATIVE_PROMPT, width=DEFAULT_IMAGE_WIDTH, height=DEFAULT_IMAGE_HEIGHT, num_inference_steps=25, guidance_scale=7.5, cfg_scale=7.0):
         try:
-            self.pipe = StableDiffusionPipeline.from_pretrained(IMAGE_MODEL_NAME,
-                                                        torch_dtype=torch.float16,
-                                                        safety_checker=None).to(self.device) #Add parameters to config!
+            if self.pipe is None:
+                print("Loading Stable Diffusion pipeline...")
+                self.pipe = StableDiffusionPipeline.from_pretrained(
+                    IMAGE_MODEL_NAME,  # You can change the model here
+                    torch_dtype=torch.float16,
+                    #safety_checker=None, #Disable the check to improve speed.
+                ).to("cuda")
+                print("Pipeline loaded successfully.")
 
-
-            #Enable optimizations, if on cuda.
-            if self.device == "cuda":
-                self.pipe.enable_model_offload()
-                self.pipe.enable_xformers_memory_efficient_attention()
-
-            print(f"Stable Diffusion Initialized on {self.device}")
-
+            with torch.autocast("cuda"):
+                image = self.pipe(
+                    prompt,
+                    negative_prompt=negative_prompt,
+                    width=width,
+                    height=height,
+                    num_inference_steps=num_inference_steps,
+                    guidance_scale=guidance_scale,
+                ).images[0]
+            return image
         except Exception as e:
-            print(f"Stable Diffusion Initialization Failed: {e}. Check CUDA, Model paths.")
-            self.pipe = None
-
-    def generate_image_stable_diffusion_local(self, prompt, negative_prompt=DEFAULT_NEGATIVE_PROMPT, width=DEFAULT_IMAGE_WIDTH, height=DEFAULT_IMAGE_HEIGHT, seed=None, cfg_scale=DEFAULT_CFG_SCALE):
-
-        if self.pipe is None:
-            print("Stable Diffusion is not initialized.")
+            print(f"Error generating image: {e}")
             return None
-        try:
 
-            generator = torch.Generator(device=self.device) #Get seed here to generate images
-            if seed is None: # If a seed is chosen
-                seed = random.randint(0, 2147483647) # create a new seed
+if __name__ == '__main__':
+    # Example usage:
+    generator = ImageGenerator()
+    prompt = "A futuristic cityscape, neon lights, cyberpunk style"
+    image = generator.generate_image_stable_diffusion_local(prompt)
 
-            generator = generator.manual_seed(seed) #Add seed
-            with torch.autocast(device_type=self.device, dtype=torch.float16): #Use autocast for mixed precision
-
-                image = self.pipe(prompt,
-                                    negative_prompt=negative_prompt, # add negative
-                                    width=width, #with
-                                    height=height, #hieght
-                                    guidance_scale=cfg_scale, #guidance
-                                    generator=generator).images[0]  # Generates
-
-            return image  # PIL Image
-        except Exception as e:
-            print(f"Stable Diffusion Error: {e}")
-            return None
+    if image:
+        image.save("generated_image.png")
+        print("Image saved to generated_image.png")
+    else:
+        print("Image generation failed.")

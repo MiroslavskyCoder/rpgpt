@@ -5,7 +5,7 @@ import os
 TEXT_MODEL_NAME = "microsoft/Phi-3.5-mini-instruct" # Default text generation model
 
 # Image Model Configuration
-IMAGE_MODEL_NAME = "runwayml/stable-diffusion-v1-5" #Default Stable Diffusion v1.5
+IMAGE_MODEL_NAME = "stabilityai/stable-diffusion-2-1" #Default Stable Diffusion v1.5
 DEFAULT_IMAGE_WIDTH = 512 # Default image width
 DEFAULT_IMAGE_HEIGHT = 512 # Default image height
 DEFAULT_CFG_SCALE = 7.5 # Default CFG scale

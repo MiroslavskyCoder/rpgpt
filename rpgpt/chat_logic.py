@@ -1,18 +1,16 @@
-# rpgpt/chat_logic.py
-from transformers import pipeline
-from config import TEXT_MODEL_NAME
 import torch
+
+from config import TEXT_MODEL_NAME
 
 class ChatLogic:
     def __init__(self, character_name, character_description, character_tags):
         self.character_name = character_name
         self.character_description = character_description
         self.character_tags = character_tags
-        # self.generator = ChatLogic.load_model()  # Load the model
-
-    @staticmethod
-    def load_model():
+        self.generator = None # Initialize generator to None
+    def load_model(self):
         try:
+            from transformers import pipeline
             generator = pipeline('text-generation', model=TEXT_MODEL_NAME, torch_dtype=torch.float16, device_map="auto")
             print("Model loaded successfully.")
             return generator
@@ -20,10 +18,17 @@ class ChatLogic:
             print(f"Error initializing pipeline: {e}")
             return None
 
+    def unload_model(self):
+        if self.generator:
+            del self.generator
+            torch.cuda.empty_cache() # Clear GPU cache
+            self.generator = None
+
     def get_hf_text_response(self, prompt):
         if self.generator is None:
-            return "Model initialization failed."
-
+            self.generator = self.load_model()
+            if self.generator is None:
+                return "Model initialization failed."
         # Build Prompt
         full_prompt = f"{self.character_description}\n{self.character_name}: {prompt}"
 
