@@ -20,6 +20,7 @@ class ChatLogic:
             return None
 
     def unload_model(self):
+        """Unload the HF model to free up GPU memory"""
         if self.generator:
             del self.generator
             torch.cuda.empty_cache()

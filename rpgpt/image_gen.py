@@ -1,6 +1,5 @@
 # rpgpt/image_gen.py
 from diffusers import StableDiffusionPipeline
-from diffusers.pipelines.stable_diffusion.utils import StableDiffusionPipelineOutput
 from PIL import Image
 import torch
 from .lora import LoraController
@@ -19,22 +18,18 @@ class ImageGenerator:
                     IMAGE_MODEL_NAME,  # You can change the model here
                     torch_dtype=torch.float16,
                     #safety_checker=None, #Disable the check to improve speed.
-                    loras=self.lora_controller.lora_models,
-                    vae_in_size=VAE_IN_SIZE,
-                    vae_out_size=VAE_OUT_SIZE
                 ).to("cuda")
                 print("Pipeline loaded successfully.")
 
             with torch.autocast("cuda"):
-                out: StableDiffusionPipelineOutput = self.pipe(
+                image = self.pipe(
                     prompt,
                     negative_prompt=negative_prompt,
                     width=width,
                     height=height,
                     num_inference_steps=num_inference_steps,
                     guidance_scale=guidance_scale,
-                )
-                image = out.images[0]
+                ).images[0]
             return image
         except Exception as e:
             print(f"Error generating image: {e}")

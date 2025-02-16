@@ -9,11 +9,14 @@ import ChatArea from './components/ChatArea';
 import ImageGeneration from './components/ImageGeneration';
 import ImageEditor from './components/ImageEditor'; // Import ImageEditor
 import MainMenu from './components/MainMenu';
+import ContextMenu from './components/ContextMenu'; // Import ContextMenu
 
 function App() {
     const [selectedCharacter, setSelectedCharacter] = useState('');
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [imageUrl, setImageUrl] = useState(''); // State to hold generated image URL
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+    const [showContextMenu, setShowContextMenu] = useState(false);
 
     const handleCharacterSelect = (characterName) => {
         setSelectedCharacter(characterName);
@@ -27,11 +30,24 @@ function App() {
         setAnchorEl(null);
     };
 
+    const handleContextMenu = (event) => {
+        event.preventDefault();
+        setContextMenuPosition({ x: event.clientX, y: event.clientY });
+        setShowContextMenu(true);
+    };
+
+    const menuItems = [
+        { label: 'Undo', shortcut: 'Ctrl+Z', onClick: () => console.log('Undo') },
+        { label: 'Redo', shortcut: 'Ctrl+Y', onClick: () => console.log('Redo') },
+        { label: 'Cut', shortcut: 'Ctrl+X', onClick: () => console.log('Cut') },
+        { label: 'Copy', shortcut: 'Ctrl+C', onClick: () => console.log('Copy') },
+        { label: 'Paste', shortcut: 'Ctrl+V', onClick: () => console.log('Paste') },
+    ];
+
     // Callback to receive the generated image URL from ImageGeneration
     const handleImageGenerated = (url) => {
         setImageUrl(url);
     };
-
     const theme = createTheme({
         palette: {
             mode: 'dark',
@@ -96,15 +112,22 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Box sx={{ flexGrow: 1 }}>
-                <MainMenu /> 
+            <Box sx={{ flexGrow: 1 }} onContextMenu={handleContextMenu}>
 
-                <Box p={3}>
-                    <CharacterSelection onCharacterSelect={handleCharacterSelect} />
-                    <ChatArea />
-                    <ImageGeneration onImageGenerated={handleImageGenerated} /> {/* Pass the callback */}
-                    {imageUrl && <ImageEditor imageUrl={imageUrl} />} {/* Render ImageEditor if imageUrl is available */}
-                </Box>
+                <MainMenu />
+
+                <ContextMenu
+                    xPos={contextMenuPosition.x}
+                    yPos={contextMenuPosition.y}
+                    menuItems={menuItems}
+                    showMenu={showContextMenu}
+                    setShowMenu={setShowContextMenu}
+                />
+
+                <CharacterSelection onCharacterSelect={handleCharacterSelect} />
+                <ChatArea />
+                <ImageGeneration onImageGenerated={handleImageGenerated} /> {/* Pass the callback */}
+                {imageUrl && <ImageEditor imageUrl={imageUrl} />} {/* Render ImageEditor if imageUrl is available */}
             </Box>
         </ThemeProvider>
     );

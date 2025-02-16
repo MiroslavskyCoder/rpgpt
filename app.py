@@ -8,9 +8,11 @@ import subprocess
 from flask_cors import CORS
 from rpgpt.chat_logic import ChatLogic
 from rpgpt.image_gen import ImageGenerator
+from rpgpt.settings import SettingsController
 from config import CHARACTER_DATA_FILE, DEFAULT_NEGATIVE_PROMPT, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_CFG_SCALE
 import time  # Import time module for simulating progress
 import threading
+
 
 app = Flask(__name__, static_folder='client/build', static_url_path='/')
 CORS(app)
