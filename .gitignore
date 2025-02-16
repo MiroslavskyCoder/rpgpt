@@ -1,0 +1,41 @@
+# Python
+*.pyc
+__pycache__/
+.venv/
+venv/
+env/
+*.egg-info
+.DS_Store
+
+# Node.js
+node_modules/
+dist/
+build/
+.parcel-cache/
+
+# Logs
+*.log
+*.out
+debug.log
+
+# IDE
+.idea/
+*.swp
+*.swo
+*.vscode/
+
+# OS
+Thumbs.db
+ehthumbs.db
+
+# Credentials / Secrets
+*.key
+*.pem
+credentials.json
+config.ini
+
+# Images generated during development
+client/public/images/generated_image.png
+
+# Other
+.env

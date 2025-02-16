@@ -1,0 +1,14 @@
+[
+    {
+        "name": "02 (Zero Two)",
+        "image_url": "https://static.wikia.nocookie.net/darling-in-the-franxx/images/8/82/Zero_Two_portrait.png",
+        "description": "A mysterious and powerful pilot from Darling in the Franxx.",
+        "available_effects": ["grayscale", "blur", "sepia", "ocio_transform", "apply_lut"]
+    },
+    {
+        "name": "Motoko Kusanagi",
+        "image_url": "https://static.wikia.nocookie.net/ghostintheshell/images/4/4a/Motoko_Kusanagi_Arise.png",
+        "description": "A cyborg public-security agent from Ghost in the Shell.",
+        "available_effects": ["grayscale", "cartoon", "sharpen"]
+    }
+]
