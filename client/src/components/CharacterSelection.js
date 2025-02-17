@@ -11,6 +11,7 @@ const CharacterSelection = ({ onCharacterSelect }) => {
         const fetchCharacters = async () => {
             try {
                 const response = await api.getCharacters();
+                console.log(response)
                 setCharacters(response.data);
             } catch (error) {
                 console.error("Error fetching characters:", error);
