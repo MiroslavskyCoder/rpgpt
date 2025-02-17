@@ -113,17 +113,29 @@ class ChatLogic:
             logging.info(f"Full input text sent to model: {chat}")
 
             # Pass only the chat (history and prompt) to the model
-            output = self.generator(chat, max_length=150, num_return_sequences=1)
-            generated_text = output[0]['generated_text']
+            output = self.generator(chat, max_length=4500, num_return_sequences=1)
 
-            # Extract the response text, assuming it follows the format "Assistant: <text>"
-            if generated_text:
-                # Split by "Assistant:" and take the last part
-                response_text = generated_text.split("Assistant:")[-1].strip()
-                logging.info(f"Generated Response Text: {response_text}")
+            logging.info(f"Raw model output: {output}") #Log model output
+
+            if isinstance(output, list) and len(output) > 0:
+                first_element = output[0] # Get the first element of the list
+
+                if isinstance(first_element, dict) and 'generated_text' in first_element:
+                    generated_content = first_element['generated_text'] # Access the list of dictionaries
+
+                    if isinstance(generated_content, list) and len(generated_content) > 0:
+                        response_text = generated_content[-1].get('content', "The model returned an empty sequence.")
+                        logging.info(f"Extracted Response Text: {response_text}")
+                    else:
+                        response_text = "The model returned an empty sequence."
+                        logging.warning("Model returned an empty or malformed sequence.")
+                else:
+                    response_text = "The model returned an empty sequence."
+                    logging.warning("Model returned an empty or malformed sequence.")
             else:
                 response_text = "The model returned an empty response."
-                logging.warning("Model returned an empty sequence.")
+                logging.warning("Model returned an empty or malformed sequence.")
+
 
             # Append chat history (cleanly)
             self.update_history({"role": "user", "content": prompt})
@@ -134,7 +146,7 @@ class ChatLogic:
         except Exception as e:
             logging.exception(f"Error generating response: {e}", exc_info=True)
             return f"An error occurred while generating the response: {e}"
-
+        
     def update_history(self, new_message):
         """Updates the chat history with a new message, handling potential size limits and saving the history."""
         self.chat_history.append(new_message)

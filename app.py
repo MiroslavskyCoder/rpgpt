@@ -7,15 +7,47 @@ import os
 import json
 import subprocess
 from flask_cors import CORS
+from flask_session import Session
 from rpgpt.chat_logic import ChatLogic
 from rpgpt.image_gen import ImageGenerator
-from rpgpt.routers import api_bp  # Import the blueprint
+from rpgpt.routers import api as api_module
 from config import CHARACTER_DATA_FILE, DEFAULT_NEGATIVE_PROMPT, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_CFG_SCALE
 import time  # Import time module for simulating progress
-import threading
+import threading 
+import torch
 
 app = Flask(__name__, static_folder='client/build', static_url_path='/')
 CORS(app)
+
+app.secret_key = os.urandom(24)  # Сгенерируйте случайный секретный ключ
+app.config['SESSION_TYPE'] = 'filesystem'
+
+Session(app)
+
+# Import your routes (api_bp) after initializing session
+app.register_blueprint(api_module.api_bp)
+
+def check_torch_cuda_availability():
+    """Проверяет доступность CUDA и выводит информацию о ней."""
+    try:
+        if torch.cuda.is_available():
+            print("CUDA доступна!")
+            print(f"Количество доступных CUDA устройств: {torch.cuda.device_count()}")
+            for i in range(torch.cuda.device_count()):
+                print(f"Устройство {i}: {torch.cuda.get_device_name(i)}")
+                properties = torch.cuda.get_device_properties(i)
+                print(f"  Суммарный объем памяти (GiB): {properties.total_memory / 1024**3:.2f}")
+                # Дополнительная информация о CUDA (закомментировано, но можно раскомментировать для более подробной информации)
+                # print(f"  Compute Capability: {properties.major}.{properties.minor}")
+                # print(f"  Driver Version / CUDA Version: {torch.version.cuda}") # Более надежный способ
+                # print(f"  CUDA Runtime Version: {torch.version.cuda}")
+        else:
+            print("CUDA не доступна.")
+            print("Проверьте, установлены ли драйверы NVIDIA и CUDA Toolkit.")
+
+    except Exception as e:
+        print(f"Произошла ошибка при проверке CUDA: {e}")
+ 
 
 # Load Character Data
 try:
@@ -46,10 +78,7 @@ except Exception as e:
     print(f"Failed to preload ChatLogic model: {e}. The application may not work correctly.")
 
 selected_character = None
-chat_logic = None
-
-app.register_blueprint(api_bp)
-
+chat_logic = None 
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
@@ -85,6 +114,7 @@ def build_react_app():
         exit(1)
 
 if __name__ == '__main__':
+    check_torch_cuda_availability()
     # Build React app before starting Flask
     print("Building React app...")
     build_react_app()

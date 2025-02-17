@@ -1,0 +1,14 @@
+# requirements.txt
+flask
+torch
+transformers
+accelerate
+sentencepiece
+protobuf
+requests
+Flask-Session
+gunicorn
+pillow
+uuid 
+scikit-learn
+numpy

@@ -2,7 +2,7 @@
 import os
 
 # Text Model Configuration
-TEXT_MODEL_NAME = "microsoft/Phi-3.5-mini-instruct" # Default text generation model
+TEXT_MODEL_NAME = "gmongaras/gpt-anime-sub-1.3B" # Default text generation model
 # microsoft/Phi-3.5-mini-instruct
 
 # Image Model Configuration
