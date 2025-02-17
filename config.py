@@ -19,6 +19,8 @@ CHAT_HISTORY_FILE = os.path.join(BASE_DIR, "data", "chat_history.json") # Chat h
 CHARACTER_DATA_FILE = os.path.join(BASE_DIR, "data", "characters.json") # Character data file
 OCIO_CONFIG_PATH = os.path.join(BASE_DIR, "data", "OCIO", "color.ocio") # OCIO config file
 
+USER_DATA_DIR = "user"
+
 # Feature Flags
 ENABLE_TEXT_TO_SPEECH = False # Enable or disable text to speech
 ENABLE_IMAGE_EDITOR = True # Enable or disable image editor

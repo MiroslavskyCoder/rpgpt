@@ -1,35 +1,48 @@
-// client/src/components/ChatArea.js
-import React, { useState, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
-import CustomTextInput from './CustomTextInput'; // Import CustomTextInput
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Box, Typography, IconButton, InputAdornment, TextField, CircularProgress } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import apiService from '../services/api';
 
 function ChatArea() {
     const [chatHistory, setChatHistory] = useState([]);
     const [prompt, setPrompt] = useState('');
+    const [isSending, setIsSending] = useState(false);
+    const chatAreaRef = useRef(null);
 
-    const handleSendMessage = useCallback(() => {
+    const handleSendMessage = useCallback(async () => {
         if (prompt.trim() !== '') {
-            // Logic to send the prompt to the backend and get a response
-            const newMessage = { text: prompt, sender: 'user' };
-            setChatHistory([...chatHistory, newMessage]);
-            setPrompt(''); // Clear the prompt input after sending
+            setIsSending(true);
+
+            try {
+                const response = await apiService.getChatResponse(prompt);
+                console.log(response.data);
+                const newMessage = { text: prompt, sender: 'user' };
+                const aiResponse = { text: response.data.response, sender: 'ai' };
+
+                setChatHistory((prevHistory) => [...prevHistory, newMessage, aiResponse]);
+                setPrompt('');
+            } catch (error) {
+                console.error('Failed to get chat response:', error);
+                const errorMesage = { text: "Error getting response", sender: 'ai' };
+                setChatHistory((prevHistory) => [...prevHistory, errorMesage]);
+            } finally {
+                setIsSending(false);
+            }
         }
-    }, [prompt, chatHistory, setChatHistory]);
+    }, [prompt, setChatHistory, setIsSending]);
 
-    const [contextMenuPosition, setContextMenuPosition] = useState(null);
-    const [showContextMenu, setShowContextMenu] = useState(false);
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default form submission
+            handleSendMessage();
+        }
+    };
 
-    const handleContextMenu = useCallback((event) => {
-        event.preventDefault();
-        setContextMenuPosition({ x: event.clientX, y: event.clientY });
-        setShowContextMenu(true);
-        // Handle context menu events here
-    }, []);
-    // Handle context menu events here
-    const handleCloseContextMenu = useCallback(() => {
-        setShowContextMenu(false);
-    }, []);
-    // Handle context menu events here
+    useEffect(() => {
+        if (chatAreaRef.current) {
+            chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
+        }
+    }, [chatHistory]);
 
     return (
         <Box
@@ -37,23 +50,42 @@ function ChatArea() {
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
-                height: '300px', // Adjust the height as needed
+                height: '300px',
                 overflowY: 'auto',
                 padding: 2,
                 border: '1px solid #ccc',
             }}
+            ref={chatAreaRef}
         >
             <Typography variant="h6">Chat Area</Typography>
-            {/* Display chat history here */}
             {chatHistory.map((message, index) => (
-                <Typography key={index}>
-                    {message.sender}: {message.text}
-                </Typography>
+                <Box key={index} sx={{ textAlign: message.sender === 'user' ? 'right' : 'left', mb: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                        {message.sender === 'user' ? 'You:' : 'AI:'}
+                    </Typography>
+                    <Typography>{message.text}</Typography>
+                </Box>
             ))}
 
             {/* Input area */}
-            <Box sx={{ marginTop: 'auto' }}>
-                <CustomTextInput setContextMenuPosition={setContextMenuPosition} setShowContextMenu={setShowContextMenu} /> {/* Use CustomTextInput for prompts */}
+            <Box sx={{ marginTop: 'auto', display: 'flex', alignItems: 'center' }}>
+                <TextField
+                    fullWidth
+                    label="Enter your message"
+                    variant="outlined"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={handleSendMessage} edge="end" disabled={isSending}>
+                                    {isSending ? <CircularProgress size={24} /> : <SendIcon />}
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
             </Box>
         </Box>
     );

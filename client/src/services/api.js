@@ -7,7 +7,7 @@ const API_BASE_URL = '/api'; // Or your actual API URL
 // Create an Axios instance with default configuration
 const api = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 10000, // Set a timeout of 10 seconds
+    timeout: 0, // Set timeout to 0 for infinite timeout
     headers: {
         'Content-Type': 'application/json',
     },
@@ -43,10 +43,35 @@ api.interceptors.response.use(
 // Define API endpoints
 const apiService = {
     getInfo: () => api.get('/info'),
-    chat: (prompt, characterName, characterDescription) => api.post('/chat', { prompt, characterName, characterDescription }),
+    getChatResponse: (
+        prompt,
+        characterName = 'Default',
+        characterDescription = 'A helpful AI.',
+        characterStyleOfSpeech = 'Default style',
+        characterCatchphrases = ['Default catchphrase'],
+        characterPersonalityTraits = ['Default trait'],
+        characterRelationships = 'No relationships',
+        characterNsfwTraits = ['Default NSFW trait'],
+        characterAllowedTopics = ['Default allowed topic'],
+        characterBannedTopics = ['Default banned topic']
+    ) => {
+        const data = {
+            prompt,
+            characterName,
+            characterDescription,
+            characterStyleOfSpeech,
+            characterCatchphrases,
+            characterPersonalityTraits,
+            characterRelationships,
+            characterNsfwTraits,
+            characterAllowedTopics,
+            characterBannedTopics
+        };
+        return api.post('/chat', data);
+    },
     generateImage: (prompt) => api.post('/image', { prompt }),
     getVersions: () => api.get('/versions'),
-    getCharacters: () => api.get('/characters'), 
+    getCharacters: () => api.get('/characters'),
 };
 
 export default apiService;

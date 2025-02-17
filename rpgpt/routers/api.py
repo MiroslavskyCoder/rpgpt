@@ -1,22 +1,33 @@
-# rpgpt/routers/api.py
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from rpgpt.chat_logic import ChatLogic
 from rpgpt.image_gen import ImageGenerator
+from rpgpt.versions import get_torch_version, get_torch_cuda_available, get_torch_cuda_device_count, get_nodejs_version, get_python_version, get_flask_version, get_pil_version, get_rpgpt_version, get_git_version
 import torch
 import logging
 import json
-from config import CHARACTER_DATA_FILE  # Import the character data file path
-from rpgpt.versions import get_git_version, get_torch_version, get_torch_cuda_available, get_torch_cuda_device_count, get_flask_version, get_python_version, get_pil_version, get_nodejs_version, get_rpgpt_version
+from config import CHARACTER_DATA_FILE, USER_DATA_DIR
+import os
+import uuid
+import platform
+import sys
+import flask
+import PIL
+import subprocess
 
-# Get the logger instance
 logger = logging.getLogger(__name__)
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+@api_bp.before_request
+def before_request():
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+        logger.info(f"Generated a new user ID: {session['user_id']}")
+ 
 @api_bp.route('/versions', methods=['GET'])
-def get_info():
+def get_versions():
     """
-    Returns information about PyTorch.
+    Returns information about various versions.
     """
     try:
         versions = {
@@ -35,27 +46,56 @@ def get_info():
         logger.exception("Error while getting versions")
         return jsonify({"error": "Failed to retrieve version information."}), 500
 
+@api_bp.route('/info', methods=['GET'])
+def get_info():
+    try:
+        info = {
+            "version": torch.__version__,
+            "cuda_available": torch.cuda.is_available(),
+            "cuda_device_count": torch.cuda.device_count()
+        }
+        return jsonify(info)
+    except Exception as e:
+        logger.exception("Error while getting PyTorch info")
+        return jsonify({"error": "Failed to retrieve PyTorch information."}), 500
+
 @api_bp.route('/chat', methods=['POST'])
 def chat():
-    """
-    Handles chat requests using the ChatLogic class.
-    """
     try:
         data = request.get_json()
         if not data or 'prompt' not in data:
             return jsonify({"error": "Prompt is required in the request body."}), 400
 
         prompt = data['prompt']
+        user_id = session['user_id'] # Get the user ID from the session
         character_name = data.get('character_name', 'Default')
         character_description = data.get('character_description', 'A helpful AI.')
+
+        character_style_of_speech = data.get('character_style_of_speech', 'Default style')
+        character_catchphrases = data.get('character_catchphrases', ['Default catchphrase'])
+        character_personality_traits = data.get('character_personality_traits', ['Default trait'])
+        character_relationships = data.get('character_relationships', 'No relationships')
+        character_nsfw_traits = data.get('character_nsfw_traits', ['Default NSFW trait'])
+        character_allowed_topics = data.get('character_allowed_topics', ['Default allowed topic'])
+        character_banned_topics = data.get('character_banned_topics', ['Default banned topic'])
 
         # Validation
         if not isinstance(prompt, str):
             return jsonify({"error": "Prompt must be a string."}), 400
 
-        chat_logic = ChatLogic(character_name, character_description)
+        chat_logic = ChatLogic(
+            character_name,
+            character_description,
+            character_style_of_speech,
+            character_catchphrases,
+            character_personality_traits,
+            character_relationships,
+            character_nsfw_traits,
+            character_allowed_topics,
+            character_banned_topics,
+            user_id  # Pass the user ID to ChatLogic
+        )
         response = chat_logic.get_hf_text_response(prompt)
-
         return jsonify({"response": response})
 
     except Exception as e:
@@ -64,9 +104,6 @@ def chat():
 
 @api_bp.route('/image', methods=['POST'])
 def generate_image():
-    """
-    Generates an image based on a prompt using the ImageGenerator class.
-    """
     try:
         data = request.get_json()
         if not data or 'prompt' not in data:
@@ -96,9 +133,6 @@ def generate_image():
 
 @api_bp.route('/characters', methods=['GET'])
 def get_characters():
-    """
-    Returns the character data from the specified JSON file.
-    """
     try:
         with open(CHARACTER_DATA_FILE, 'r', encoding='utf-8') as f:
             character_data = json.load(f)
